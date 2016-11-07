@@ -1,0 +1,31 @@
+name:                dynamic-meta
+category:            Educational
+version:             0.1.0.0
+synopsis:            Methods for live coding in Haskell
+description:         Methods for live coding (dynamic recompilation without reloading the world)
+homepage:            https://github.com/mmn80/dynamic-meta
+bug-reports:         https://github.com/mmn80/dynamic-meta/issues
+author:              Călin Ardelean
+maintainer:          Călin Ardelean <mmn80cpu@gmail.com>
+copyright:           Copyright (c) 2016 Călin Ardelean
+license:             MIT
+license-file:        LICENSE.md
+stability:           experimental
+build-type:          Simple
+cabal-version:       >=1.10
+extra-source-files:
+  README.md
+
+source-repository head
+  type:     git
+  location: https://github.com/mmn80/dynamic-meta.git
+
+executable dynamic
+  main-is:           Main.hs
+  hs-source-dirs:    src
+  other-modules:     World, Physics, Cat
+  default-language:  Haskell2010
+  ghc-options:       -O2 -Wall -threaded -rtsopts
+  build-depends:
+    base             >= 4.8 && < 5,
+    containers
