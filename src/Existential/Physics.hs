@@ -1,6 +1,6 @@
-module Physics (inspectWorld) where
+module Existential.Physics (inspectWorld) where
 
-import World
+import Existential.World
 
 inspectWorld :: IO String
 inspectWorld = foldWorld f

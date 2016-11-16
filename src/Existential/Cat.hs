@@ -1,6 +1,6 @@
-module Cat where
+module Existential.Cat where
 
-import World
+import Existential.World
 
 data Cat = Cat { catHealth :: Int, blackCat :: Bool }
 
