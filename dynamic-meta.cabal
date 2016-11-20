@@ -23,6 +23,7 @@ source-repository head
 library
   hs-source-dirs:    src
   exposed-modules:
+    Refs,
     Existential.World,
     Existential.Physics,
     Existential.Cat,

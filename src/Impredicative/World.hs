@@ -1,5 +1,4 @@
 {-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ImpredicativeTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -8,54 +7,53 @@ module Impredicative.World (Entity(..), health, attack, Ref, spawn, withEntity, 
 import Control.Concurrent.MVar
 import System.IO.Unsafe
 import qualified Data.IntMap.Strict as Map
+import Refs
 
-data Entity a = Entity a (a -> Int) (Int -> a -> a)
+-- abstract Entity (hand made typeclass)
 
-health :: Entity a -> Int
+data Entity e = Entity e (e -> Int) (Int -> e -> e)
+
+health :: forall e. Entity e -> Int
 health (Entity e h _) = h e
 
-attack :: Entity a -> Int -> Entity a
+attack :: Entity e -> Int -> Entity e
 attack (Entity e h a) x = Entity (a x e) h a
 
-type SomeEntity = forall x. (forall a. Entity a -> x) -> x
+-- existential wrapper around Entity
 
-mkSomeEntity :: Entity a -> SomeEntity
+type SomeEntity = forall x. (forall e. Entity e -> x) -> x
+
+mkSomeEntity :: forall e. Entity e -> SomeEntity
 mkSomeEntity e = \f -> f e
 
-withSomeEntity :: forall b. SomeEntity -> (forall e. Entity e -> (Entity e, b)) -> (SomeEntity, b)
+withSomeEntity :: forall b. SomeEntity -> (forall e. Entity e -> (Entity e, b))
+                                       -> (SomeEntity, b)
 withSomeEntity se f = se $ \e -> let (e', b) = f e
                                  in (mkSomeEntity e', b)
+
+-- world
 
 world :: MVar (Map.IntMap SomeEntity)
 world = unsafePerformIO $ newMVar (Map.empty :: Map.IntMap SomeEntity)
 
-newtype Ref = Ref { getRef :: Int } deriving Num
-
-instance Show Ref where show (Ref k) = show k
-
-ref :: MVar Ref
-ref = unsafePerformIO . newMVar $ Ref 0
-
-spawn :: Entity a -> IO Ref
+spawn :: forall e. Entity e -> IO Ref
 spawn e = do
-  Ref k <- takeMVar ref
-  let r = Ref (k + 1)
-  putMVar ref (r `seq` r)
+  r <- newRef
   w <- takeMVar world
   putMVar world $ Map.insert (getRef r) (mkSomeEntity e) w
   return r
 
-withEntity :: Ref -> (forall a. Entity a -> (Entity a, b)) -> IO (Maybe b)
+withEntity :: forall b. Ref -> (forall e. Entity e -> (Entity e, b)) -> IO (Maybe b)
 withEntity (Ref k) f = do
   w <- takeMVar world
   let (w', mb) = case Map.lookup k w of
-                   Just e -> let (e', x) = withSomeEntity e f in
-                                 (Map.insert k e' w, Just x)
+                   Just se -> let (se', x) = withSomeEntity se f
+                              in (Map.insert k se' w, Just x)
                    Nothing -> (w, Nothing)
   putMVar world w'
   return mb
 
-foldWorld :: forall m. Monoid m => (forall a. Ref -> Entity a -> m) -> IO m
+foldWorld :: forall m. Monoid m => (forall e. Ref -> Entity e -> m) -> IO m
 foldWorld f = readMVar world >>= return . Map.foldMapWithKey f'
   where f' :: Int -> SomeEntity -> m
         f' k se = snd $ withSomeEntity se $ \e -> (e, f (Ref k) e)
