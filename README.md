@@ -40,3 +40,23 @@ data Entity e = Entity e (e -> Int) (Int -> e -> e)
 
 type SomeEntity = forall x. (forall e. Entity e -> x) -> x
 ```
+
+## Dynamic.World
+
+`Data.Dynamic` encoding (`Typeable` + `Any` + `unsafeCoerce`)
+
+We need to keep the object _and_ every method separately wrapped in `Dynamic`,
+and then use `dynApp` to write abstract functions.
+`dynApp` does dynamic type checking under the hood.
+
+```Haskell
+{-# LANGUAGE ScopedTypeVariables #-} 
+
+data SomeEntity = SomeEntity Dynamic Dynamic Dynamic
+
+mkSomeEntity :: forall e. Entity e => e -> SomeEntity
+mkSomeEntity e = SomeEntity (toDyn e) (toDyn (_health :: e -> Int))
+                                      (toDyn (_attack :: Int -> e -> e))
+```
+
+`Dynamic` works like a built in dependent pair indexed by `Typeable`.

@@ -32,7 +32,10 @@ library
     Church.Cat,
     GADT.World,
     GADT.Physics,
-    GADT.Cat
+    GADT.Cat,
+    Dynamic.World,
+    Dynamic.Physics,
+    Dynamic.Cat
   default-language:  Haskell2010
   ghc-options:       -O2 -Wall -threaded -rtsopts
   build-depends:
