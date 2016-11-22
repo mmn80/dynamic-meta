@@ -29,7 +29,10 @@ library
     Existential.Cat,
     Church.World,
     Church.Physics,
-    Church.Cat
+    Church.Cat,
+    GADT.World,
+    GADT.Physics,
+    GADT.Cat
   default-language:  Haskell2010
   ghc-options:       -O2 -Wall -threaded -rtsopts
   build-depends:
