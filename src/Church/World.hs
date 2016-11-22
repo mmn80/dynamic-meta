@@ -2,7 +2,7 @@
 {-# LANGUAGE ImpredicativeTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Impredicative.World (Entity(..), health, attack, Ref, spawn, withEntity, foldWorld) where
+module Church.World (Entity(..), health, attack, Ref, spawn, withEntity, foldWorld) where
 
 import Control.Concurrent.MVar
 import System.IO.Unsafe
@@ -16,7 +16,7 @@ data Entity e = Entity e (e -> Int) (Int -> e -> e)
 health :: forall e. Entity e -> Int
 health (Entity e h _) = h e
 
-attack :: Entity e -> Int -> Entity e
+attack :: forall e. Entity e -> Int -> Entity e
 attack (Entity e h a) x = Entity (a x e) h a
 
 -- existential wrapper around Entity

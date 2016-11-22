@@ -1,6 +1,6 @@
-module Impredicative.Physics (inspectWorld) where
+module Church.Physics (inspectWorld) where
 
-import Impredicative.World
+import Church.World
 
 inspectWorld :: IO String
 inspectWorld = foldWorld f

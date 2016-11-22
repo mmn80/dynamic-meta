@@ -27,8 +27,9 @@ library
     Existential.World,
     Existential.Physics,
     Existential.Cat,
-    Impredicative.World,
-    Impredicative.Physics
+    Church.World,
+    Church.Physics,
+    Church.Cat
   default-language:  Haskell2010
   ghc-options:       -O2 -Wall -threaded -rtsopts
   build-depends:
