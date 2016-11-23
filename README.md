@@ -60,3 +60,20 @@ mkSomeEntity e = SomeEntity (toDyn e) (toDyn (_health :: e -> Int))
 ```
 
 `Dynamic` works like a built in dependent pair indexed by `Typeable`.
+
+## Idris
+
+In the `srcidr` folder there is an **Idris** implementation with dependent types.
+
+We use dependent pairs (the analog for existential quantification), and the
+generic functions just take an explicit extra argument `(e : Type)` in order
+to force them to be polymorphic.
+
+```Idris
+HList : Type
+HList = List (e : Type ** Entity e)
+
+foldWorld : Monoid m => HList -> ((e : Type) -> Entity e -> m) -> m
+foldWorld w f = foldl f' neutral w
+  where f' r (a ** ent) = r <+> f a ent
+```
