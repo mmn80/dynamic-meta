@@ -1,30 +1,29 @@
 module World
 
 %access export
+%default total
 
-record Entity e where
+public export
+record Entity t where
   constructor MkEntity
-  _entity : e
-  _health : e -> Int
-  _attack : Int -> e -> e
+  health : t -> Int
+  attack : Int -> t -> t
 
-health : Entity e -> Int
-health (MkEntity x h _) = h x
+%name Entity i, i', i''
 
-attack : Int -> Entity e -> Entity e
-attack d (MkEntity x h a) = MkEntity (a d x) h a
+Host : Type
+Host = List (t : Type ** (Entity t, t))
 
-HList : Type
-HList = List (e : Type ** Entity e)
+%name Host w, w', w''
 
-spawn : HList -> Entity e -> HList
-spawn l x = (e ** x) :: l
+spawn : Entity t -> t -> Host -> Host
+spawn i e w = (t ** (i, e)) :: w
 
-withEntity : HList -> ((e : Type) -> Entity e -> (Entity e, b)) -> (HList, Maybe b)
-withEntity [] f = ([], Nothing)
-withEntity ((a ** x) :: xs) f = let (a', x) = f a x
-                                in ((a ** a') :: xs, Just x)
+withEntity : Host -> ((t : Type) -> Entity t -> t -> (t, b)) -> (Host, Maybe b)
+withEntity [] _ = ([], Nothing)
+withEntity ((t' ** (i, e)) :: w) f = let (e', x) = f t' i e
+                                     in ((t' ** (i, e')) :: w, Just x)
 
-foldWorld : Monoid m => HList -> ((e : Type) -> Entity e -> m) -> m
+foldWorld : Monoid m => Host -> ((t : Type) -> Entity t -> t -> m) -> m
 foldWorld w f = foldl f' neutral w
-  where f' r (a ** ent) = r <+> f a ent
+  where f' m (t ** (i, e)) = m <+> f t i e
