@@ -1,0 +1,7 @@
+package dynamic
+
+opts = "--total"
+
+pkgs = contrib
+
+modules = World, Physics, Cat

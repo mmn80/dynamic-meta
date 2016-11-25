@@ -65,15 +65,14 @@ mkSomeEntity e = SomeEntity (toDyn e) (toDyn (_health :: e -> Int))
 
 In the `srcidr` folder there is an **Idris** implementation with dependent types.
 
-We use dependent pairs (the analog for existential quantification), and the
-generic functions just take an explicit extra argument `(e : Type)` in order
-to force them to be polymorphic.
+We use dependent pairs (sigma types), and the user supplied generic actions just
+take an explicit extra argument `(e : Type)` in order to make them polymorphic.
 
 ```Idris
-HList : Type
-HList = List (e : Type ** Entity e)
+Host : Type
+Host = SortedMap Key (t : Type ** (Entity t, t))
 
-foldWorld : Monoid m => HList -> ((e : Type) -> Entity e -> m) -> m
-foldWorld w f = foldl f' neutral w
-  where f' r (a ** ent) = r <+> f a ent
+foldWorld : Monoid m => Host -> ((t : Type) -> Entity t -> Key -> t -> m) -> m
+foldWorld w f = foldl f' neutral (toList w)
+  where f' m (k, (t ** (i, e))) = m <+> f t i k e
 ```

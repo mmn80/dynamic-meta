@@ -3,7 +3,6 @@ module Cat
 import World
 
 %access export
-%default total
 
 record Cat where
   constructor MkCat
@@ -20,5 +19,5 @@ catAttack x (MkCat h b) = if b then MkCat (h + x) b
 entityCat : Entity Cat
 entityCat = MkEntity catHealth catAttack
 
-spawnCat : Cat -> Host -> Host
+spawnCat : Key -> Cat -> Host -> Host
 spawnCat = spawn entityCat
