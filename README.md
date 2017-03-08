@@ -39,6 +39,8 @@ Church encoded existential types (`-XRankNTypes` and `-XImpredicativeTypes`)
 data Entity e = Entity e (e -> Int) (Int -> e -> e)
 
 type SomeEntity = forall x. (forall e. Entity e -> x) -> x
+
+_Note:_ This no longer works in GHC 8...
 ```
 
 ## Dynamic.World
